@@ -13,29 +13,31 @@ public class RemoteCacheConfig {
 
     private static Logger LOG = Logger.getLogger(RemoteCacheConfig.class.getName());
 
-    private InfinispanConfigProperties infinispanConfigProperties;
+    private InfinispanConfigProperties configurationProperties;
 
     public RemoteCacheConfig(InfinispanConfigProperties infinispanConfigProperties) {
-        this.infinispanConfigProperties = infinispanConfigProperties;
+        this.configurationProperties = infinispanConfigProperties;
     }
 
     @Bean
     public RemoteCacheManager remoteCacheManager() {
+        LOG_CONFIG(configurationProperties);
+        return new RemoteCacheManager(CREATE_CONFIGURATION_BUILDER(configurationProperties));
+    }
+
+    private static org.infinispan.client.hotrod.configuration.Configuration
+    CREATE_CONFIGURATION_BUILDER(InfinispanConfigProperties config) {
+        return new ConfigurationBuilder().addServer().host(config.getHost()).port(config.getPort()).security()
+                .authentication().enable().serverName(config.getServerName()).username(config.getUsername())
+                .password(config.getPassword()).realm(config.getRealm()).saslMechanism(config.getSaslMechanism())
+                .build();
+    }
+
+    private static void LOG_CONFIG(InfinispanConfigProperties config) {
         LOG.info(
-                String.format("Creating Remote Connection with Details: Servername=%s, Host=%s, Port=%s, Username=%s, Password=*****, Realm=%s, SaslMechanism=%s",
-                        infinispanConfigProperties.getServerName(), infinispanConfigProperties.getHost(),
-                        infinispanConfigProperties.getPort(), infinispanConfigProperties.getUsername(),
-                        infinispanConfigProperties.getRealm(), infinispanConfigProperties.getSaslMechanism()));
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.addServer().host(infinispanConfigProperties.getHost()).port(infinispanConfigProperties.getPort())
-                .security()
-                .authentication().enable()
-                .serverName(infinispanConfigProperties.getServerName())
-                .username(infinispanConfigProperties.getUsername())
-                .password(infinispanConfigProperties.getPassword())
-                .realm(infinispanConfigProperties.getRealm())
-                .saslMechanism(infinispanConfigProperties.getSaslMechanism());
-        return new RemoteCacheManager(cb.build());
+                String.format("Creating Remote Connection with Details: Servername=%s, Host=%s, Port=%s, Username=%s," +
+                                " Password=*****, Realm=%s, SaslMechanism=%s", config.getServerName(), config.getHost(),
+                        config.getPort(), config.getUsername(), config.getRealm(), config.getSaslMechanism()));
     }
 
 }

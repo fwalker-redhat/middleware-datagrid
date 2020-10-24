@@ -6,10 +6,9 @@ import java.util.UUID;
 
 public class StringGenerator {
 
-    public static String value(Long length) {
+    public static String value(int length) {
         return StringUtils.abbreviate(
-                StringUtils.leftPad(UUID.randomUUID().toString(), length.intValue(), "0"),
-                length.intValue());
+                StringUtils.leftPad(UUID.randomUUID().toString(), length, "0"), length);
     }
 
 }
