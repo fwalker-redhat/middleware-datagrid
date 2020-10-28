@@ -9,7 +9,7 @@ public class InfinispanConfigProperties {
 
     private String serverName;
     private String host;
-    private int port;
+    private int port = 11222;
     private String username;
     private String password;
     private String realm;
